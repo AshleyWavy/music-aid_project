@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spotify API</title>
+    <script src="https://code.jquery.com/jquery.js"></script>
+<!--    
+    <link rel="stylesheet" type="text/css" href="public/style.css" /> 
+-->
+    <style>
+        body{
+            background-color: darkseagreen;
+            font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+            font-size: 14px;
+        }
+        input[type=text] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: none;
+        background-color: #3CBC8D;
+        color: white;
+        }
+        button{
+             background-color: #353839; /* Onyx */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+        }
+        fieldset{
+            border: none;
+        }
+        
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 80%;
+        }
+
+        td, th {
+        border: 1px solid #ffffff;
+/*        text-align: left;*/
+        padding: 8px;
+        }
+
+        tr{
+/*        background-color: #dddddd;*/
+        }
+        img{
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+  <script>
+    console.log("when my client query is sent to server blank it crashes");
+    console.log("if i leave form blank for album search and click search it crashes");
+    "use strict";
+    $().ready(function(){
+        $("#result").hide();
+        $("#formArea").hide();
+        
+        $("#albumSearch").on("click", function(e){
+                e.preventDefault();
+                $("#formArea").show();
+                $("#artistForm").hide();
+                $("#albumForm").show();
+                $("#trackForm").hide();
+        });
+        $("#artistSearch").on("click", function(e){
+                e.preventDefault();
+                $("#formArea").show();
+                $("#albumForm").hide();
+                $("#artistForm").show();
+                $("#trackForm").hide();
+        });
+        $("#trackSearch").on("click", function(e){
+                e.preventDefault();
+                $("#formArea").show();
+                $("#albumForm").hide();
+                $("#artistForm").hide();
+                $("#trackForm").show();
+        });
+        
+        $("#submit").on("click", function(e){
+            
+            //$("#artistForm").hide();
+            $("#result").show();
+
+            e.preventDefault();
+            
+            
+            //get value from fields.
+            var data = {
+                albumName: $("#typeAlbum").val()
+            };
+            
+//            $.post("/formdata",data,function(result){
+//                result = JSON.parse(result); //turn the string into a JavaScript object
+//                console.log(result);
+//                var html = "<li>Name: " + result.fullName + "</li>";
+//                $("#result > ul").html(html);
+//
+//            });
+            $.post("/albums",data,function(result){
+                result = JSON.parse(result); //turn the string into a JavaScript object
+                console.log(result); //log results into console on client side
+                
+                var items = result;
+                //console.log(items);
+                var resultArea = $("#resultArea");
+                $('#resultArea').html('');
+                //result = "";
+                
+                var headingRow = $("<tr></tr>");
+
+                var headings = "<th>Album Art</th>";
+                headings += "<th> Album </th>";
+                headings += "<th> Artist </th>";
+                headingRow.append(headings);
+                resultArea.append(headingRow);
+                
+                for (var i = 0; i<items.length; i++)
+                {
+                    var item = items[i];
+                    var output = '<td>' + '<img src="' + item.albumImage + '">' + '</td>'; 
+                    output += "<td>" + item.albumName + "</td>";
+                    output += "<td>" + item.albumArtist + "</td>";
+                    //output += "<td>" + item.albumID + "</td>";
+//                    var artists = item.artists;
+//                    for (var j = 0; j<artists.length; j++) 
+//                    {
+//                    var artist = artists[j];
+//                    output += "artist: " + artist.name + "<br/>";
+//                    }
+                var para = $("<tr></tr>");
+                para.html(output);
+                resultArea.append(para);
+                }
+//            var html = "<li>Name: " + result.fullName + "</li>";
+//                $("#result > div").html(html);
+
+            });
+        });
+        
+        $("#submitArtist").on("click", function(e){
+            //$("#artistForm").hide();
+            $("#result").show();
+
+            e.preventDefault();
+            
+            
+            //get value from fields.
+            var data = {
+                artistName: $("#typeArtist").val()
+            };
+            console.log(data); // for testing check developer tools
+            
+            $.post("/artists",data,function(result){
+                result = JSON.parse(result); //turn the string into a JavaScript object
+                console.log(result); //log results into console on client side
+                
+                var items = result;
+                console.log(items);
+                var resultArea = $("#resultArea");
+                $('#resultArea').html('');
+                
+                var headingRow = $("<tr></tr>");
+
+                var headings = "<th>Artist Name</th>";
+                headings += "<th> </th>";
+                headings += "<th>  </th>";
+                headingRow.append(headings);
+                resultArea.append(headingRow);
+
+
+                for (var i = 0; i<items.length; i++)
+                {
+                     var item = items[i];
+                     var output = "<td>" + item.artistName + "</td>";
+                    output += "<td>" + '<img src="' + item.artistImage.url + '"></td>'; 
+                    //output += "<td>"  + item.id + "</td>";
+                    output += "<td>"  + '<button id= "' + item.artistID + '">' + 'Add' + "</button>" + "</td>";
+
+                    //var artists = item.artists;
+                    // for (var j = 0; j<artists.length; j++) 
+                    // {
+                    // var Track = artists[j];
+                    // output += "Track: " + Track.name + "<br/>";
+                    // }
+                    var para = $("<tr></tr>");//create a row
+                    para.html(output);
+                    resultArea.append(para);
+               }
+            
+        });
+    });
+        
+    $("#submitTrack").on("click", function(e){
+            //$("#artistForm").hide();
+            $("#result").show();
+
+            e.preventDefault();
+            
+            
+            //get value from fields.
+            var data = {
+                trackName: $("#typeTrack").val()
+            };
+            console.log(data); // for testing check developer tools
+            
+            $.post("/tracks",data,function(result){
+                result = JSON.parse(result); //turn the string into a JavaScript object
+                console.log(result); //log results into console on client side
+                
+                var items = result;
+                
+                var resultArea = $("#resultArea");
+                $('#resultArea').html('');
+                
+                var headingRow = $("<tr></tr>");
+
+                var headings = "<th> Name</th>";
+                headings += "<th> Artist</th>";
+                headings += "<th> Time </th>";
+                headings += "<th> </th>";
+                headingRow.append(headings);
+                resultArea.append(headingRow);
+
+
+                for (var i = 0; i<items.length; i++)
+                {
+                     var item = items[i];
+                     var output = "<td>" + item.trackName + "</td>";
+                     //output += "<td>" + '<img src="' + item.trackArtist + '">' + '</td>'; 
+                     output += "<td>"  + item.trackArtist + "</td>";
+                     output += "<td>"  + item.trackLength + "</td>";
+                    output += "<td>"  + '<button id= "' + item.trackID + '">' + 'Add' + "</button>" + "</td>";
+
+                    //var artists = item.artists;
+                    // for (var j = 0; j<artists.length; j++) 
+                    // {
+                    // var Track = artists[j];
+                    // output += "Track: " + Track.name + "<br/>";
+                    // }
+                    var para = $("<tr></tr>");//create a row
+                    para.html(output);
+                    resultArea.append(para);
+               }
+            
+        });
+    });
+        
+});
+    </script>
+</head>
+<body>
+
+    <h1>spotify api by a-team!</h1>
+    <center>by: ajm x iib</center>
+    <a href="" id="albumSearch">search album</a>
+    <a href="" id="artistSearch">search artist</a>
+    <a href="" id="trackSearch">search track</a>
+    <div id="formArea">
+    <h3></h3>
+    <form method="POST" action="">
+       
+        <fieldset id="albumForm">
+        <br/>
+        <label>search for an album:</label> 
+        <input type="text" id="typeAlbum">
+        <button id = "submit">search</button>
+        </fieldset>
+        
+        
+        <fieldset id="artistForm">
+        <br/>
+        <label>search for an artist:</label> 
+        <input type="text" id="typeArtist">
+        <button id = "submitArtist">search</button>
+        </fieldset>
+        
+        <fieldset id="trackForm">
+        <br/>
+        <label>search for an track:</label> 
+        <input type="text" id="typeTrack">
+        <button id = "submitTrack">search</button>
+        </fieldset>
+        <!--
+        <input type="submit" id = "submit" name = "Submit">
+        -->
+    </form>
+    </div>
+    
+    <!--This div will be hiding until i click add-->
+<!--
+    <div id="userPrompt">
+        <label>please enter your username:</label><br/>
+        <input></input><br/>
+    </div>
+-->
+
+    <div id="result">
+        <h3>Results!</h3>
+        <a href="/" id="again">phone home (go home roger!)</a>
+
+        <table id="resultArea">
+        </table>
+    </div>
+   
+    <script>
+    // Get the input field
+    var input = document.getElementById("typeArtist");
+
+    // Execute a function when the user releases a key on the keyboard
+    input.addEventListener("keyup", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Trigger the button element with a click
+        document.getElementById("submitArtist").click();
+    }
+    });
+    </script>
+</body>
+</html>
