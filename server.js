@@ -219,8 +219,9 @@ function millisToMinutesAndSeconds(millis) {
 //DATABASE
 //var Album = require("../models/albums.js");
 
-app.listen(8080);
-
+//app.listen(8080);
+var port = process.env.port || 8080;
+app.listen(port);
 
 
 
